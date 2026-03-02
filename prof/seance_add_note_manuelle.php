@@ -1,0 +1,62 @@
+<?php
+require_once "../includes/auth.php";
+require_once "../includes/db.php";
+
+protectPage("prof");
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: gestion_seances.php");
+    exit;
+}
+
+$idSeance = (int)($_POST["id_seance"] ?? 0);
+$idParcours = (int)($_POST["id_parcours"] ?? 0);
+$note = $_POST["note_manuelle"] ?? null;
+
+if ($idSeance <= 0 || $idParcours <= 0 || $note === null || $note === "") {
+    header("Location: seance_detail.php?id=" . $idSeance);
+    exit;
+}
+
+$noteStr = str_replace(",", ".", trim((string)$note));
+if (!is_numeric($noteStr)) {
+    header("Location: seance_detail.php?id=" . $idSeance);
+    exit;
+}
+$noteFinale = (float)$noteStr;
+
+$existing = $pdo->prepare(
+    "SELECT id_resultat
+     FROM seance_resultat
+     WHERE id_seance = ? AND id_parcours = ?
+     ORDER BY id_resultat DESC
+     LIMIT 1"
+);
+$existing->execute([$idSeance, $idParcours]);
+$row = $existing->fetch();
+
+if ($row) {
+    $upd = $pdo->prepare(
+        "UPDATE seance_resultat
+         SET note_finale = ?, use_auto = 0
+         WHERE id_resultat = ?"
+    );
+    $upd->execute([$noteFinale, (int)$row["id_resultat"]]);
+} else {
+    $ins = $pdo->prepare(
+        "INSERT INTO seance_resultat
+         (id_seance, id_parcours, nb_valides, nb_invalides, note_auto, note_finale, use_auto, heure_debut, heure_fin, duree)
+         VALUES (?, ?, 0, 0, 0, ?, 0, ?, ?, ?)"
+    );
+    $ins->execute([
+        $idSeance,
+        $idParcours,
+        $noteFinale,
+        null,
+        null,
+        null
+    ]);
+}
+
+header("Location: seance_detail.php?id=" . $idSeance);
+exit;

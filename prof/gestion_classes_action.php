@@ -1,0 +1,34 @@
+<?php
+require_once "../includes/auth.php";
+require_once "../includes/db.php";
+require_once "../includes/normalize.php";
+
+protectPage("prof");
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: gestion_classes.php");
+    exit;
+}
+
+$classeRaw = trim($_POST["classe"] ?? "");
+// Normalize: collapse spaces, keep letters/numbers/space/underscore/hyphen
+$classe = normalize_text($classeRaw);
+$classe = trim($classe);
+if ($classe === "" || !preg_match("/^[A-Za-z0-9][A-Za-z0-9 _-]{0,49}$/", $classe)) {
+    header("Location: gestion_classes.php?error=1");
+    exit;
+}
+
+// Check duplicate
+$stmt = $pdo->prepare("SELECT id_classe FROM classe WHERE LOWER(nom) = LOWER(?)");
+$stmt->execute([$classe]);
+if ($stmt->fetch()) {
+    header("Location: gestion_classes.php?error=1");
+    exit;
+}
+
+$insert = $pdo->prepare("INSERT INTO classe (nom) VALUES (?)");
+$insert->execute([$classe]);
+
+header("Location: gestion_classes.php");
+exit;

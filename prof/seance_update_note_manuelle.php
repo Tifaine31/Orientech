@@ -1,0 +1,35 @@
+<?php
+require_once "../includes/auth.php";
+require_once "../includes/db.php";
+
+protectPage("prof");
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: gestion_seances.php");
+    exit;
+}
+
+$idResultat = (int)($_POST["id_resultat"] ?? 0);
+$idSeance = (int)($_POST["id_seance"] ?? 0);
+$note = $_POST["note_manuelle"] ?? null;
+
+if ($idResultat <= 0 || $idSeance <= 0) {
+    header("Location: seance_detail.php?id=" . $idSeance);
+    exit;
+}
+
+$noteFinale = 0.0;
+if ($note !== null && $note !== "") {
+    $noteStr = str_replace(",", ".", trim((string)$note));
+    if (!is_numeric($noteStr)) {
+        header("Location: seance_detail.php?id=" . $idSeance);
+        exit;
+    }
+    $noteFinale = (float)$noteStr;
+}
+
+$upd = $pdo->prepare("UPDATE seance_resultat SET note_finale = ?, use_auto = 0 WHERE id_resultat = ?");
+$upd->execute([$noteFinale, $idResultat]);
+
+header("Location: seance_detail.php?id=" . $idSeance);
+exit;

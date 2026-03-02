@@ -1,0 +1,110 @@
+﻿<?php
+require_once "../includes/auth.php";
+require_once "../includes/db.php";
+require_once "../includes/normalize.php";
+
+protectPage("prof");
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: gestion_classes.php");
+    exit;
+}
+
+$idClasse = (int)($_POST["id_classe"] ?? 0);
+if ($idClasse <= 0) {
+    header("Location: gestion_classes.php");
+    exit;
+}
+
+if (!isset($_FILES["csv_file"]) || $_FILES["csv_file"]["error"] !== UPLOAD_ERR_OK) {
+    header("Location: modifier_classe.php?id_classe=" . $idClasse);
+    exit;
+}
+
+$tmpPath = $_FILES["csv_file"]["tmp_name"];
+$handle = fopen($tmpPath, "r");
+if ($handle === false) {
+    header("Location: modifier_classe.php?id_classe=" . $idClasse);
+    exit;
+}
+
+$passwordHash = password_hash("1234", PASSWORD_DEFAULT);
+
+$pdo->beginTransaction();
+try {
+    $rowIndex = 0;
+    while (($row = fgetcsv($handle, 0, ";")) !== false) {
+        $rowIndex++;
+
+        // Skip empty rows
+        if (!isset($row[0]) || trim($row[0]) === "") {
+            continue;
+        }
+
+        // Skip header row if present
+        if ($rowIndex === 1 && stripos($row[0], "Ã©lÃ¨ve") !== false) {
+            continue;
+        }
+
+        // First column expected: "NOM PrÃ©nom"
+        $full = trim($row[0]);
+        $parts = preg_split("/\\s+/", $full);
+        if (!$parts || count($parts) < 2) {
+            continue;
+        }
+
+        $nom = normalize_name(strtoupper(array_shift($parts)));
+        $prenom = normalize_name(implode(" ", $parts));
+
+        $loginBase = normalize_login($nom, $prenom);
+        if ($loginBase === ".") {
+            continue;
+        }
+
+        // Ensure unique login
+        $login = $loginBase;
+        $suffix = 1;
+        while (true) {
+            $chk = $pdo->prepare("SELECT id_utilisateur FROM utilisateur WHERE login = ?");
+            $chk->execute([$login]);
+            if (!$chk->fetch()) {
+                break;
+            }
+            $suffix++;
+            $login = $loginBase . $suffix;
+        }
+
+        $ins = $pdo->prepare(
+            "INSERT INTO utilisateur (nom, prenom, login, password, acreditation)
+             VALUES (?, ?, ?, ?, 'eleve')"
+        );
+        $ins->execute([$nom, $prenom, $login, $passwordHash]);
+
+        $newId = (int)$pdo->lastInsertId();
+
+        // Close current class (if any) and assign to this class
+        $close = $pdo->prepare(
+            "UPDATE liaison_classe SET date_fin = CURDATE()
+             WHERE id_utilisateur = ? AND date_fin IS NULL"
+        );
+        $close->execute([$newId]);
+
+        $link = $pdo->prepare(
+            "INSERT INTO liaison_classe (id_utilisateur, id_classe, date_debut, date_fin)
+             VALUES (?, ?, CURDATE(), NULL)"
+        );
+        $link->execute([$newId, $idClasse]);
+    }
+
+    $pdo->commit();
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+}
+
+fclose($handle);
+
+header("Location: modifier_classe.php?id_classe=" . $idClasse);
+exit;
+

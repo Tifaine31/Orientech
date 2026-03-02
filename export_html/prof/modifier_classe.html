@@ -1,0 +1,99 @@
+﻿
+
+<!-- Contenu -->
+<div class="container my-4">
+    <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+
+        <!-- Titre + retour -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">Classe : <?= htmlspecialchars($classe["nom"]) ?></h4>
+            <button class="btn btn-outline-success rounded-pill" onclick="window.location.href='gestion_classes.php'">
+                â† Retour
+            </button>
+        </div>
+
+        <!-- Renommer la classe -->
+        <form class="row g-3 mb-4" method="post" action="modifier_classe_rename.php">
+            <input type="hidden" name="id_classe" value="<?= (int)$classe["id_classe"] ?>">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Nom de la classe</label>
+                <input type="text" name="nom" class="form-control rounded-pill" value="<?= htmlspecialchars($classe["nom"]) ?>" required>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-orientech rounded-pill px-4" type="submit">Renommer</button>
+            </div>
+        </form>
+
+        <!-- Ajouter un Ã©lÃ¨ve -->
+        <div class="mb-4">
+            <form class="d-flex gap-2" method="post" action="modifier_classe_add_eleve.php">
+                <input type="hidden" name="id_classe" value="<?= (int)$classe["id_classe"] ?>">
+                <select name="id_utilisateur" class="form-select rounded-pill" required>
+                    <option value="">SÃ©lectionner un Ã©lÃ¨ve</option>
+                    
+                        <option value="<?= (int)$e["id_utilisateur"] ?>">
+                            <?= htmlspecialchars($e["prenom"] . " " . $e["nom"] . " (" . $e["login"] . ")") ?>
+                        </option>
+                    
+                </select>
+                <button class="btn btn-orientech rounded-pill px-4" type="submit">
+                    + Ajouter lâ€™Ã©lÃ¨ve
+                </button>
+            </form>
+        </div>
+
+        <!-- Import CSV -->
+        <div class="mb-4">
+            <form class="d-flex gap-2" method="post" action="modifier_classe_import_csv.php" enctype="multipart/form-data">
+                <input type="hidden" name="id_classe" value="<?= (int)$classe["id_classe"] ?>">
+                <input type="file" name="csv_file" class="form-control rounded-pill" accept=".csv" required>
+                <button class="btn btn-orientech rounded-pill px-4" type="submit">
+                    Importer CSV
+                </button>
+            </form>
+            <small class="text-muted d-block mt-2">
+                Format attendu (CSV) : la 1Ã¨re colonne contient "NOM PrÃ©nom". Le login est gÃ©nÃ©rÃ© "nom.prenom" et le mot de passe par dÃ©faut est "1234".
+            </small>
+        </div>
+
+        <!-- Liste Ã©lÃ¨ves de la classe -->
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Nom</th>
+                        <th>PrÃ©nom</th>
+                        <th>Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr>
+                            <td colspan="4">Aucun Ã©lÃ¨ve dans cette classe.</td>
+                        </tr>
+                    
+                        
+                            <tr>
+                                <td><?= htmlspecialchars($e["nom"]) ?></td>
+                                <td><?= htmlspecialchars($e["prenom"]) ?></td>
+                                <td><?= htmlspecialchars($e["login"]) ?></td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-danger rounded-pill"
+                                       href="modifier_classe_remove_eleve.php?id_classe=<?= (int)$classe["id_classe"] ?>&id_utilisateur=<?= (int)$e["id_utilisateur"] ?>"
+                                       onclick="return confirm('Retirer cet Ã©lÃ¨ve de la classe ?');">
+                                        Retirer
+                                    </a>
+                                </td>
+                            </tr>
+                        
+                    
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+

@@ -1,0 +1,64 @@
+﻿
+
+
+    <!-- Contenu -->
+    <div class="container my-4">
+
+        <div class="card shadow border-0 rounded-4 p-4">
+            <!-- Titre + retour -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">Gestion des classes</h4>
+            <button class="btn btn-outline-success rounded-pill"
+                    onclick="retourEleve()">
+                ← Retour
+            </button>
+        </div>
+
+            <h4 class="text-center fw-bold mb-4">Historique</h4>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center">
+                    <thead>
+                        <tr class="table-secondary">
+                            <th style="width: 20%">Date</th>
+                            <th style="width: 60%">Résultats</th>
+                            <th style="width: 20%">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr><td colspan="3">Aucun résultat.</td></tr>
+                        
+                            
+                                <tr>
+                                    <td><?= htmlspecialchars(substr($r["date_heure"], 0, 10)) ?></td>
+                                    <td>
+                                        
+                                            <span class="ok">✔</span>
+                                        
+                                        
+                                            <span class="ko">✖</span>
+                                        
+                                    </td>
+                                    <td><strong><?= htmlspecialchars((string)$r["note_finale"]) ?>/20</strong></td>
+                                </tr>
+                            
+                        
+                    </tbody>
+                </table>
+
+
+            </div>
+
+        </div>
+    </div>
+
+<!-- Script -->
+<script>
+    function retourEleve() {
+        window.location.href = "eleve.php";
+    }
+</script>
+
+
+

@@ -1,0 +1,35 @@
+﻿<?php
+require_once "../includes/auth.php";
+require_once "../includes/db.php";
+
+protectPage("prof");
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: gestion_eleves.php");
+    exit;
+}
+
+$id = (int)($_POST["id_utilisateur"] ?? 0);
+$idClasse = trim($_POST["id_classe"] ?? "");
+
+if ($id > 0) {
+    // Close current active class (if any)
+    $close = $pdo->prepare(
+        "UPDATE liaison_classe
+         SET date_fin = CURDATE()
+         WHERE id_utilisateur = ? AND date_fin IS NULL"
+    );
+    $close->execute([$id]);
+
+    if ($idClasse !== '' && ctype_digit($idClasse)) {
+        $link = $pdo->prepare(
+            "INSERT INTO liaison_classe (id_utilisateur, id_classe, date_debut, date_fin)
+             VALUES (?, ?, CURDATE(), NULL)"
+        );
+        $link->execute([$id, (int)$idClasse]);
+    }
+}
+
+header("Location: gestion_eleves.php");
+exit;
+

@@ -1,0 +1,43 @@
+﻿<?php
+// Valeur par défaut si rien n’est défini
+$roleLabel = $roleLabel ?? "Utilisateur";
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $pageTitle ?? "ORIENTECH95" ?></title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1">
+    <link rel="apple-touch-icon" href="/favicon.jpg?v=1">
+    <link rel="icon" type="image/jpeg" href="/favicon.jpg?v=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS projet -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body class="bg-light">
+
+<!-- Header -->
+<div class="container-fluid d-flex justify-content-between align-items-start py-3 px-4">
+    <img src="/logo_complet.png" height="60" alt="ORIENTECH95">
+
+    <div class="text-end">
+        <div class="fw-bold text-orientech mb-2">
+            <?= htmlspecialchars($roleLabel) ?>
+        </div>
+
+        <a class="btn btn-outline-success rounded-pill" href="/logout.php">
+            Déconnexion
+        </a>
+    </div>
+</div>
+
+

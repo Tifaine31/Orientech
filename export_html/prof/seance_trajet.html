@@ -1,0 +1,76 @@
+﻿
+
+<div class="container my-4">
+    <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">Trajet sÃ©ance</h4>
+            <button class="btn btn-outline-success rounded-pill" onclick="window.location.href='historique_seances.php'">
+                â† Retour
+            </button>
+        </div>
+
+        <p class="mb-1"><strong>Ã‰lÃ¨ve :</strong> <?= htmlspecialchars($seance["prenom"] . " " . $seance["nom"]) ?></p>
+        <p class="mb-1"><strong>Date :</strong> <?= htmlspecialchars($seance["date_heure"]) ?></p>
+        <p class="mb-3"><strong>BoÃ®tier :</strong> <?= $boitier ? ("#" . (int)$boitier["numero_boitier"]) : "Non attribuÃ©" ?></p>
+
+        <div id="map" style="height: 420px; border-radius: 16px;"></div>
+
+        <h5 class="fw-bold mt-4 mb-3">Historique balises</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Heure</th>
+                        <th>Balise</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr><td colspan="4">Aucune localisation.</td></tr>
+                    
+                        
+                            <tr>
+                                <td><?= htmlspecialchars($p["created_at"]) ?></td>
+                                <td><?= htmlspecialchars((string)$p["numerodecarte"]) ?></td>
+                                <td><?= htmlspecialchars((string)$p["latitude"]) ?></td>
+                                <td><?= htmlspecialchars((string)$p["longitude"]) ?></td>
+                            </tr>
+                        
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const points = <?= json_encode($points, JSON_UNESCAPED_UNICODE) ?>;
+const map = L.map('map');
+
+if (points.length === 0) {
+  // LycÃ©e AndrÃ© Malraux - BÃ©thune
+  map.setView([50.51942, 2.65176], 17);
+} else {
+  const latlngs = points.map(p => [parseFloat(p.latitude), parseFloat(p.longitude)]);
+  map.fitBounds(latlngs, { padding: [20, 20] });
+
+  const polyline = L.polyline(latlngs, { color: '#4CAF50', weight: 4 }).addTo(map);
+  latlngs.forEach((ll, idx) => {
+    const label = points[idx].numerodecarte ? `Balise ${points[idx].numerodecarte}` : `Point ${idx+1}`;
+    L.marker(ll).addTo(map).bindPopup(label);
+  });
+}
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+</script>
+
+
+

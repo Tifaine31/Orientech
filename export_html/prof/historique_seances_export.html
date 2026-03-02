@@ -1,0 +1,58 @@
+﻿
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: center; }
+        th { background: #c9cdca; font-weight: bold; }
+    </style>
+</head>
+<body>
+<table>
+    <colgroup>
+        <col style="width: 160px;">
+        <col style="width: 220px;">
+        <col style="width: 120px;">
+        <col style="width: 180px;">
+        <col style="width: 90px;">
+        <col style="width: 90px;">
+        <col style="width: 120px;">
+        <col style="width: 120px;">
+        <col style="width: 100px;">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>Date &amp; heure</th>
+            <th>Eleve</th>
+            <th>Classe</th>
+            <th>Parcours</th>
+            <th>Validees</th>
+            <th>Note finale</th>
+            <th>Heure debut</th>
+            <th>Heure fin</th>
+            <th>Duree</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        
+        <tr>
+            <td><?= htmlspecialchars($r["date_heure"]) ?></td>
+            <td><?= htmlspecialchars($eleve) ?></td>
+            <td><?= htmlspecialchars($r["classe_nom"] ?? "") ?></td>
+            <td><?= htmlspecialchars($r["parcours_nom"]) ?></td>
+            <td><?= htmlspecialchars($validesStr) ?></td>
+            <td><?= htmlspecialchars((string)$r["note_finale"]) ?></td>
+            <td><?= htmlspecialchars($r["heure_debut"] ?? "") ?></td>
+            <td><?= htmlspecialchars($r["heure_fin"] ?? "") ?></td>
+            <td><?= htmlspecialchars($r["duree"] ?? "") ?></td>
+        </tr>
+    
+    </tbody>
+</table>
+</body>
+</html>
+<?php
+exit;
+

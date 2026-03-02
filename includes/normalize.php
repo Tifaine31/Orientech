@@ -1,0 +1,45 @@
+<?php
+
+function normalize_text(string $s): string {
+    $s = trim($s);
+    if ($s === "") {
+        return $s;
+    }
+    $s = iconv("UTF-8", "ASCII//TRANSLIT", $s);
+    $s = preg_replace("/[^A-Za-z0-9 _-]/", " ", $s);
+    $s = preg_replace("/\s+/", " ", $s);
+    return trim($s);
+}
+
+function normalize_name(string $s): string {
+    $s = normalize_text($s);
+    // Remove spaces inside names (e.g., "G UNTH" -> "GUNTH")
+    $s = str_replace(" ", "", $s);
+    return $s;
+}
+
+function normalize_login(string $nom, string $prenom): string {
+    $n = strtolower(normalize_text($nom));
+    $p = strtolower(normalize_text($prenom));
+    $n = preg_replace("/\s+/", ".", $n);
+    $p = preg_replace("/\s+/", ".", $p);
+    $login = trim($n . "." . $p, ".");
+    $login = preg_replace("/[^a-z0-9.]/", "", $login);
+    $login = preg_replace("/\.{2,}/", ".", $login);
+    return $login;
+}
+
+function normalize_login_input(string $s): string {
+    $s = trim($s);
+    if ($s === "") {
+        return $s;
+    }
+    $s = iconv("UTF-8", "ASCII//TRANSLIT", $s);
+    $s = strtolower($s);
+    $s = preg_replace("/[^a-z0-9._-]/", "", $s);
+    $s = preg_replace("/\.{2,}/", ".", $s);
+    $s = preg_replace("/_{2,}/", "_", $s);
+    $s = preg_replace("/-{2,}/", "-", $s);
+    $s = trim($s, "._-");
+    return $s;
+}

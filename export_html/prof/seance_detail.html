@@ -1,0 +1,84 @@
+﻿
+
+<div class="container my-4">
+    <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">
+                SÃ©ance de <?= htmlspecialchars($seance["prenom"] . " " . $seance["nom"]) ?>
+            </h4>
+            <button class="btn btn-outline-success rounded-pill" onclick="window.location.href='gestion_seances.php'">
+                â† Retour
+            </button>
+        </div>
+
+        <!-- Parcours associÃ© (lecture seule) -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">Parcours de la sÃ©ance</label>
+            <input type="text" class="form-control"
+                   value="<?= count($parcours) ? htmlspecialchars($parcours[0]["nom"]) : "Aucun parcours" ?>"
+                   disabled>
+        </div>
+
+        
+        <div class="mb-4">
+            <form class="row g-3" method="post" action="seance_add_note_manuelle.php">
+                <input type="hidden" name="id_seance" value="<?= (int)$seance["id_seance"] ?>">
+                <input type="hidden" name="id_parcours" value="<?= (int)$parcours[0]["numero_du_parcours"] ?>">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Note manuelle</label>
+                    <input type="text" name="note_manuelle" class="form-control"
+                           inputmode="decimal"
+                           placeholder="Ex: 13 ou 13,5"
+                           title="Nombre uniquement (dÃ©cimales autorisÃ©es)"
+                           required>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-orientech rounded-pill px-4" type="submit">
+                        Enregistrer la note manuelle
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+
+        <!-- RÃ©sultats -->
+        <h5 class="fw-bold mb-3">RÃ©sultats</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Parcours</th>
+                        <th>DifficultÃ©</th>
+                        <th>ValidÃ©es</th>
+                        <th>Note manuelle</th>
+                        <th>Heure dÃ©but</th>
+                        <th>Heure fin</th>
+                        <th>DurÃ©e</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr><td colspan="6">Aucun rÃ©sultat.</td></tr>
+                    
+                        
+                            <tr>
+                                <td><?= htmlspecialchars($r["parcours_nom"]) ?></td>
+                                <td><?= htmlspecialchars($r["niveau"] ?? "") ?></td>
+                                <td><?= (int)$r["nb_valides"] ?>/<?= (int)$r["total_balises"] ?></td>
+                                <td><?= htmlspecialchars((string)$r["note_finale"]) ?></td>
+                                <td><?= htmlspecialchars($r["heure_debut"] ?? "") ?></td>
+                                <td><?= htmlspecialchars($r["heure_fin"] ?? "") ?></td>
+                                <td><?= htmlspecialchars($r["duree"] ?? "") ?></td>
+                            </tr>
+                        
+                    
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+

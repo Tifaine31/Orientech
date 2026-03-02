@@ -1,0 +1,92 @@
+﻿
+
+<!-- Contenu -->
+<div class="container my-4">
+
+    <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+
+        <!-- Titre + retour -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">Gestion des parcours</h4>
+
+            <!-- Retour outline -->
+            <button class="btn btn-outline-success rounded-pill"
+                    onclick="retourDashboard()">
+                ← Retour
+            </button>
+        </div>
+
+        <!-- Ajouter -->
+        <div class="mb-4">
+            <form class="row g-3" method="post" action="gestion_parcours_action.php">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Nom</label>
+                    <input type="text" name="nom" class="form-control rounded-pill" placeholder="Ex: Orientation A" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Niveau</label>
+                    <input type="text" name="niveau" class="form-control rounded-pill" placeholder="Ex: Débutant">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Commentaire</label>
+                    <input type="text" name="commentaire" class="form-control rounded-pill" placeholder="Optionnel">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-orientech rounded-pill px-4" type="submit">
+                        + Créer un parcours
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tableau parcours -->
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Nom du parcours</th>
+                        <th>Description</th>
+                        <th>Nombre de balises</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr>
+                            <td><?= htmlspecialchars($p["nom"] ?? "") ?></td>
+                            <td><?= htmlspecialchars($p["commentaire"] ?? "") ?></td>
+                            <td><?= (int)($p["nb_balises"] ?? 0) ?></td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-success rounded-pill me-2"
+                                   href="modifier_parcours.php?id=<?= (int)$p["numero_du_parcours"] ?>">
+                                    Gérer
+                                </a>
+                                <a class="btn btn-sm btn-outline-danger rounded-pill"
+                                   href="gestion_parcours_delete.php?id=<?= (int)$p["numero_du_parcours"] ?>"
+                                   onclick="return confirm('Supprimer ce parcours ?');">
+                                    Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+function retourDashboard() {
+    window.location.href = "prof.php";
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("error") === "1") {
+    alert("Erreur: nom déjà utilisé ou champs invalides.");
+}
+</script>
+
+
+
