@@ -1,0 +1,98 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container my-4">
+    <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-orientech mb-0">Gestion des classes</h4>
+            <button class="btn btn-outline-success rounded-pill" onclick="window.location.href='{{ url('/prof') }}'">
+                ← Retour
+            </button>
+        </div>
+
+        <div class="mb-4">
+            <form class="d-flex gap-2" method="post" action="{{ url('/prof/gestion-classes') }}">
+                @csrf
+                <input type="text"
+                       name="classe"
+                       class="form-control rounded-pill"
+                       placeholder="Rechercher ou créer une classe (ex: 2A-Tech)"
+                       list="classes-list"
+                       autocomplete="off"
+                       required>
+                <datalist id="classes-list">
+                    @foreach ($classes as $c)
+                        <option value="{{ $c->classe }}"></option>
+                    @endforeach
+                </datalist>
+                <button class="btn btn-orientech rounded-pill px-4" type="submit">
+                    + Ajouter une classe
+                </button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-secondary">
+                <tr>
+                    <th>Classe</th>
+                    <th>Nombre d’élèves</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($classes as $c)
+                    <tr>
+                        <td>{{ $c->classe }}</td>
+                        <td>{{ (int)$c->nb_eleves }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-success rounded-pill me-2"
+                               href="{{ url('/prof/modifier-classe') }}?id_classe={{ (int)$c->id_classe }}">
+                                Gérer
+                            </a>
+                            <form class="d-inline"
+                                  method="post"
+                                  action="{{ url('/prof/gestion-classes/' . (int)$c->id_classe . '/delete') }}"
+                                  onsubmit="return confirm('Supprimer la classe {{ addslashes($c->classe) }} ?');">
+                                @csrf
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" type="submit">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const error = "{{ session('error') }}";
+if (error === "exists") {
+    alert("Cette classe existe déjà.");
+}
+if (error === "invalid") {
+    alert("Nom de classe invalide. Lettres/chiffres/tirets/espaces seulement.");
+}
+if (error === "has_students") {
+    alert("Impossible de supprimer: retire d’abord les élèves de cette classe.");
+}
+
+const form = document.querySelector("form[action='{{ url('/prof/gestion-classes') }}']");
+if (form) {
+    form.addEventListener("submit", function (e) {
+        const input = form.querySelector("input[name='classe']");
+        const value = (input?.value || "").trim();
+        if (!value) return;
+        const options = Array.from(document.querySelectorAll("#classes-list option")).map(o => o.value);
+        if (options.includes(value)) {
+            e.preventDefault();
+            alert("Cette classe existe déjà.");
+        }
+    });
+}
+</script>
+@endsection
