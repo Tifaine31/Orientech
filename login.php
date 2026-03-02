@@ -1,4 +1,4 @@
-﻿ï»¿<?php
+<?php
 require_once __DIR__ . "/includes/auth.php";
 require_once __DIR__ . "/includes/db.php";
 
@@ -16,7 +16,20 @@ if ($login === "" || $password === "") {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT id_utilisateur, login, password, acreditation FROM utilisateur WHERE login = ?");
+// Support both legacy and current schema variants for "utilisateur".
+$columns = $pdo->query("SHOW COLUMNS FROM utilisateur")->fetchAll(PDO::FETCH_COLUMN, 0);
+$idCol = in_array("id_utilisateur", $columns, true) ? "id_utilisateur" : "id";
+$passwordCol = in_array("password", $columns, true) ? "password" : "mdp";
+$roleCol = in_array("acreditation", $columns, true) ? "acreditation" : "role";
+
+$sql = sprintf(
+    "SELECT `%s` AS user_id, login, `%s` AS user_password, `%s` AS user_role FROM utilisateur WHERE login = ?",
+    $idCol,
+    $passwordCol,
+    $roleCol
+);
+
+$stmt = $pdo->prepare($sql);
 $stmt->execute([$login]);
 $user = $stmt->fetch();
 
@@ -25,15 +38,16 @@ if (!$user) {
     exit;
 }
 
-$storedHash = $user["password"];
+$storedHash = (string)($user["user_password"] ?? "");
 $isValid = password_verify($password, $storedHash);
 
 // Backward compatibility: if passwords were stored in plain text, allow once and rehash.
 if (!$isValid && hash_equals($storedHash, $password)) {
     $isValid = true;
     $newHash = password_hash($password, PASSWORD_DEFAULT);
-    $upd = $pdo->prepare("UPDATE utilisateur SET password = ? WHERE id_utilisateur = ?");
-    $upd->execute([$newHash, $user["id_utilisateur"]]);
+    $sqlUpdate = sprintf("UPDATE utilisateur SET `%s` = ? WHERE `%s` = ?", $passwordCol, $idCol);
+    $upd = $pdo->prepare($sqlUpdate);
+    $upd->execute([$newHash, $user["user_id"]]);
 }
 
 if (!$isValid) {
@@ -41,7 +55,7 @@ if (!$isValid) {
     exit;
 }
 
-$_SESSION["role"] = $user["acreditation"] ?: "eleve";
+$_SESSION["role"] = $user["user_role"] ?: "eleve";
 $_SESSION["login"] = $user["login"];
 
 switch ($_SESSION["role"]) {
@@ -60,4 +74,3 @@ switch ($_SESSION["role"]) {
 }
 exit;
 ?>
-

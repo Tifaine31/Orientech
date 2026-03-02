@@ -8,17 +8,35 @@ $roleLabel = "Professeur";
 
 include "../includes/header.php";
 
-$classes = $pdo->query(
-    "SELECT c.id_classe,
+// Support both legacy and current schema variants.
+$classeColumns = $pdo->query("SHOW COLUMNS FROM classe")->fetchAll(PDO::FETCH_COLUMN, 0);
+$liaisonColumns = $pdo->query("SHOW COLUMNS FROM liaison_classe")->fetchAll(PDO::FETCH_COLUMN, 0);
+
+$classeIdCol = in_array("id_classe", $classeColumns, true) ? "id_classe" : "id";
+$liaisonClasseCol = in_array("id_classe", $liaisonColumns, true) ? "id_classe" : $classeIdCol;
+$liaisonEleveCol = in_array("id_utilisateur", $liaisonColumns, true) ? "id_utilisateur" : "id_eleve";
+$liaisonHasDateFin = in_array("date_fin", $liaisonColumns, true);
+
+$joinActive = $liaisonHasDateFin ? "AND l.date_fin IS NULL" : "";
+$classesSql = sprintf(
+    "SELECT c.`%s` AS id_classe,
             c.nom AS classe,
-            COUNT(l.id_liaison) AS nb_eleves
+            COUNT(l.`%s`) AS nb_eleves
      FROM classe c
      LEFT JOIN liaison_classe l
-       ON l.id_classe = c.id_classe
-      AND l.date_fin IS NULL
-     GROUP BY c.id_classe, c.nom
-     ORDER BY c.nom"
-)->fetchAll();
+       ON l.`%s` = c.`%s`
+      %s
+     GROUP BY c.`%s`, c.nom
+     ORDER BY c.nom",
+    $classeIdCol,
+    $liaisonEleveCol,
+    $liaisonClasseCol,
+    $classeIdCol,
+    $joinActive,
+    $classeIdCol
+);
+
+$classes = $pdo->query($classesSql)->fetchAll();
 ?>
 
 <!-- Contenu -->

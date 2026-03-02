@@ -1,7 +1,7 @@
-﻿<?php
+<?php
 // Simple PDO connection helper
 $dbHost = "127.0.0.1";
-$dbName = "projet";
+$dbName = "course_orientation";
 $dbUser = "root";
 $dbPass = "root";
 $dbCharset = "utf8mb4";
@@ -16,6 +16,6 @@ try {
     ]);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo "Erreur connexion base de données.";
+    echo "Erreur connexion base de donnees.";
     exit;
 }
