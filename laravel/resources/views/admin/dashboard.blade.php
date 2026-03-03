@@ -12,7 +12,7 @@
             </div>
             <div class="col-md-6 col-lg-5">
                 <button class="dashboard-btn" onclick="location.href='{{ url('/admin/balises/ajouter') }}'">
-                    Ajouter Balise
+                    Ajout balise
                 </button>
             </div>
             <div class="col-md-6 col-lg-5">

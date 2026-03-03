@@ -4,7 +4,7 @@
 <div class="container my-4">
     <div class="card shadow border-0 rounded-4 p-4 p-md-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-orientech mb-0">Ajouter une balise (via boitier)</h4>
+            <h4 class="fw-bold text-orientech mb-0">Ajout balise</h4>
             <button class="btn btn-outline-success rounded-pill" onclick="window.location.href='{{ url('/admin') }}'">
                 <- Retour
             </button>
