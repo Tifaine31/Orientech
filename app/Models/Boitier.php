@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 class Boitier extends Model // Changez 'boitier' en 'Boitier'
 {
     protected $table = 'boitier';
-    protected $fillable = ['mac', 'numero_boitier', 'reseau'];
+    protected $fillable = ['device_id', 'numero_boitier'];
 }

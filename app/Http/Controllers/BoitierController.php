@@ -33,12 +33,11 @@ class BoitierController extends Controller
 
             // --- MODE 0 : SUIVI (Fonctionnement normal) ---
             if ($mode == 0) {
-                $macRecue = $request->input('mac'); // Correspond au JSON envoyé
+                $macRecue = $request->input('device_id'); // Correspond au JSON envoyé
 
                 // Utilisation de firstOrCreate pour éviter de créer des doublons
                 $boitier = Boitier::firstOrCreate(
-                    ['mac' => $macRecue],
-                    ['reseau' => $request->input('reseau')]
+                    ['device_id' => $macRecue],
                 );
 
                 $seance = \DB::table('seance')
