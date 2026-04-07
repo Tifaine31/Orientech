@@ -40,7 +40,7 @@ class BoitierController extends Controller
                     ['device_id' => $macRecue],
                 );
 
-                $seance = \DB::table('seance')
+                $seance = DB::table('seance')
                     ->where('id_boitier', $boitier->id)
                     ->orderBy('date_debut', 'desc')
                     ->first();
