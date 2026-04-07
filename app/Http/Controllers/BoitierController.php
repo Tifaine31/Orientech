@@ -18,7 +18,7 @@ class BoitierController extends Controller
             $inputs = $request->all();
             $mode = $inputs['mode'] ?? 0;
 
-            // --- MODE 1 : ADMIN (Enregistrement balise) ---
+            // --- MODE 1 : ADMIN (Enregistrement balise) --
             if ($mode == 1 && isset($inputs['tag'])) {
                 Balise::updateOrCreate(
                     ['tag' => trim($inputs['tag'])],
